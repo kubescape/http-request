@@ -5,5 +5,5 @@ The http-request package is meant to replace the curl command by a simple go scr
 ## Usage
 
 ```
-docker run quay.io/armosec/http_request --scheme <> --host <> --path <> --method <>
+docker run quay.io/armosec/http_request -scheme <> -host <> -path <> -method <>
 ```
