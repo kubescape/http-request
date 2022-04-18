@@ -4,14 +4,14 @@ on:
   push:
     branches: [ master ]
 jobs:
-  once:
-    name: Create release
+  tag:
+    name: Create tag
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
-      - name: Create a release
-        id: create_release
+      - name: Create a tag
+        id: create_tag
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -54,7 +54,7 @@ jobs:
 
   build-docker:
     name: Build docker container, tag and upload to registry
-    needs: build
+    needs: tag
     runs-on: ubuntu-latest
     if: ${{ github.repository_owner == 'armosec' }} # TODO
     permissions:
