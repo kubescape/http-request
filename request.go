@@ -34,7 +34,7 @@ func (f *FlagParser) parser() {
 
 	// flag.StringVar(&f.pathToBody, "body", "", "body")
 	flag.StringVar(&f.pathToBody, "path-body", "", "path to body")
-	flag.StringVar(&f.pathToHeaders, "headers", "", "headers")
+	flag.StringVar(&f.pathToHeaders, "headers", "", "http headers")
 	// flag.StringVar(&f.pathToHeaders, "path-headers", "", "path to headers")
 
 	flag.Parse()
@@ -43,6 +43,9 @@ func (f *FlagParser) parser() {
 func (f *FlagParser) validate() error {
 	if f.fullURL.Host == "" {
 		return fmt.Errorf("missing host")
+	}
+	if f.method == "" {
+		return fmt.Errorf("missing method")
 	}
 	return nil
 }
@@ -70,6 +73,7 @@ func loadBody(f *FlagParser) ([]byte, error) {
 		// Not suppored
 	}
 	if f.pathToBody != "" {
+		fmt.Printf("loading body from: %s\n", f.pathToBody)
 		return os.ReadFile(f.pathToBody)
 	}
 	return []byte{}, nil
@@ -88,6 +92,8 @@ func Request(f *FlagParser) error {
 	if e != nil {
 		return e
 	}
+
+	fmt.Printf("method: %s, url: %s, headers: %v, body: %s\n", f.method, f.fullURL.String(), headers, body)
 
 	switch f.method {
 	case "POST", "post":

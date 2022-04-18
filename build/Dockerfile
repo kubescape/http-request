@@ -8,14 +8,16 @@ ENV CGO_ENABLED=0
 
 WORKDIR /work
 ADD . .
- 
+
+RUN apk add git
+
 # build kubescape cmd
 WORKDIR /work
 RUN go build -o build/http_request
 
 FROM alpine
 
-RUN addgroup -S request && adduser -S ks -G request
+RUN addgroup -S request && adduser -S request -G request
 USER request
 WORKDIR /home/request/
 
