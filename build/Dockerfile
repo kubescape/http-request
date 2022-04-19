@@ -11,15 +11,14 @@ ADD . .
 
 RUN apk add git
 
-# build kubescape cmd
 WORKDIR /work
 RUN go build -o build/http_request
 
 FROM alpine
 
-RUN addgroup -S request && adduser -S request -G request
-USER request
-WORKDIR /home/request/
+RUN addgroup -S armo && adduser -S armo -G armo
+USER armo
+WORKDIR /home/armo/
 
 COPY --from=builder /work/build/http_request /usr/bin/http_request
 
