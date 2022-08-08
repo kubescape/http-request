@@ -16,9 +16,9 @@ RUN go build -o build/http_request
 
 FROM alpine
 
-RUN addgroup -S armo && adduser -S armo -G armo
-USER armo
-WORKDIR /home/armo/
+RUN addgroup -S ks && adduser -S ks -G ks
+USER ks
+WORKDIR /home/ks/
 
 COPY --from=builder /work/build/http_request /usr/bin/http_request
 
