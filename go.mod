@@ -1,9 +1,9 @@
-module github.com/armosec/http-request
+module github.com/kubescape/http-request
 
 go 1.18
 
 require (
-	github.com/armosec/utils-go v0.0.5
+	github.com/armosec/utils-go v0.0.12
 	github.com/stretchr/testify v1.7.0
 )
 
