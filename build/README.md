@@ -4,7 +4,7 @@
 
 1. Clone Project
 ```
-git clone https://github.com/armosec/http-request.git kubescape && cd "$_"
+git clone https://github.com/armosec/http-request.git http-request && cd "$_"
 ```
 
 2. Build
