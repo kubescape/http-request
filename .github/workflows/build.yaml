@@ -26,6 +26,7 @@ jobs:
         run: go build -v ./...
   tag:
     name: Create tag
+    needs: test
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
@@ -40,39 +41,3 @@ jobs:
           release_name: Release v0.0.${{ github.run_number }}
           draft: false
           prerelease: false
-
-  build-docker:
-    name: Build docker container, tag and upload to registry
-    needs: tag
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      packages: write
-      contents: read
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set image version
-        id: image-version
-        run: echo '::set-output name=IMAGE_VERSION::v0.0.${{ github.run_number }}'
-
-      - name: Set image name
-        id: image-name
-        run: echo '::set-output name=IMAGE_NAME::quay.io/${{ github.repository_owner }}/http_request'
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to Quay.io
-        env: # Or as an environment variable
-          QUAY_PASSWORD: ${{ secrets.QUAYIO_REGISTRY_PASSWORD }}
-          QUAY_USERNAME: ${{ secrets.QUAYIO_REGISTRY_USERNAME }}
-        run: docker login -u="${QUAY_USERNAME}" -p="${QUAY_PASSWORD}" quay.io
-
-      - name: Build the Docker image
-        run: docker buildx build . --file build/Dockerfile --tag ${{ steps.image-name.outputs.IMAGE_NAME }}:${{ steps.image-version.outputs.IMAGE_VERSION }} --tag ${{ steps.image-name.outputs.IMAGE_NAME }}:latest --build-arg image_version=${{ steps.image-version.outputs.IMAGE_VERSION }} --push --platform linux/amd64,linux/arm64
-       
