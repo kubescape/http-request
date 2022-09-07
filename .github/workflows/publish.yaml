@@ -2,11 +2,11 @@ name: publish-docker-image
 
 on:
   release:
-    types: [ published]
+    types: [ created ]
     branches: [ master ]
     paths-ignore:
       - '**.md'
-      
+
   workflow_call:
     secrets:
       QUAYIO_REGISTRY_PASSWORD:
