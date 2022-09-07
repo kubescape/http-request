@@ -14,6 +14,7 @@ func TestValidate(t *testing.T) {
 				Host: "localhost:8080",
 			},
 		}
+		f.method = "POST"
 		assert.NoError(t, f.validate())
 	}
 	{

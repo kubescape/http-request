@@ -70,7 +70,7 @@ func loadHeaders(f *FlagParser) (map[string]string, error) {
 
 func loadBody(f *FlagParser) ([]byte, error) {
 	if f.body != "" {
-		// Not suppored
+		// Not supported
 	}
 	if f.pathToBody != "" {
 		fmt.Printf("loading body from: %s\n", f.pathToBody)
