@@ -1,0 +1,42 @@
+name: pr-merged
+on:
+  pull_request_target:
+    types: [closed]
+    branches: 
+    - 'main'
+    paths-ignore:
+      - '*.md' 
+      - '*.yaml'
+      - '.github/workflows/*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+    
+jobs:
+  pr-merged:
+    if: ${{ github.event.pull_request.merged == true }} ## Skip if not merged 
+    uses: kubescape/workflows/.github/workflows/incluster-comp-pr-merged.yaml@main
+    with:
+      IMAGE_NAME: quay.io/${{ github.repository_owner }}/http-request
+      IMAGE_TAG: v0.2.${{ github.run_number }}
+      COMPONENT_NAME: http-request
+      CGO_ENABLED: 0
+      GO111MODULE: "on"
+      BUILD_PLATFORM: linux/amd64,linux/arm64
+      GO_VERSION: "1.20"
+      REQUIRED_TESTS: '[
+            "vulnerability_scanning_triggering_with_cron_job", 
+            "registry_scanning_triggering_with_cron_job", 
+            "ks_microservice_ns_creation",
+            "ks_microservice_on_demand", 
+            "ks_microservice_mitre_framework_on_demand", 
+            "ks_microservice_nsa_and_mitre_framework_demand", 
+            "ks_microservice_triggering_with_cron_job", 
+            "ks_microservice_update_cronjob_schedule", 
+            "ks_microservice_delete_cronjob", 
+            "ks_microservice_create_2_cronjob_mitre_and_nsa"
+            ]'
+      COSIGN: true
+      HELM_E2E_TEST: true
+    secrets: inherit
