@@ -2,7 +2,7 @@ name: pr_checks
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
     types: [ edited, opened, synchronize, reopened ]
     paths-ignore:
       - '**.md'
