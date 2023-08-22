@@ -12,12 +12,11 @@ import (
 )
 
 type FlagParser struct {
-	fullURL       url.URL
-	pathToBody    string
-	body          string
-	pathToHeaders string
-	headers       string
-	method        string
+	fullURL      url.URL
+	pathToBody   string
+	headers      string
+	method       string
+	pathToOutput string
 }
 
 func NewFlagParser() *FlagParser {
@@ -32,10 +31,9 @@ func (f *FlagParser) parser() {
 	flag.StringVar(&f.fullURL.Host, "host", "", "host")
 	flag.StringVar(&f.fullURL.Path, "path", "", "path")
 
-	// flag.StringVar(&f.pathToBody, "body", "", "body")
 	flag.StringVar(&f.pathToBody, "path-body", "", "path to body")
-	flag.StringVar(&f.pathToHeaders, "headers", "", "http headers")
-	// flag.StringVar(&f.pathToHeaders, "path-headers", "", "path to headers")
+	flag.StringVar(&f.headers, "headers", "", "http headers")
+	flag.StringVar(&f.pathToOutput, "path-output", "", "path to output file")
 
 	flag.Parse()
 }
@@ -62,16 +60,10 @@ func loadHeaders(f *FlagParser) (map[string]string, error) {
 		}
 		return headers, nil
 	}
-	if f.pathToHeaders != "" {
-		// Not supported
-	}
 	return headers, nil
 }
 
 func loadBody(f *FlagParser) ([]byte, error) {
-	if f.body != "" {
-		// Not supported
-	}
 	if f.pathToBody != "" {
 		fmt.Printf("loading body from: %s\n", f.pathToBody)
 		return os.ReadFile(f.pathToBody)
@@ -80,41 +72,47 @@ func loadBody(f *FlagParser) ([]byte, error) {
 }
 
 // Request run a http request
-func Request(f *FlagParser) error {
+func Request(f *FlagParser) (string, error) {
 	var resp *http.Response
 	var err error
 
 	headers, e := loadHeaders(f)
 	if e != nil {
-		return e
+		return "", e
 	}
 	body, e := loadBody(f)
 	if e != nil {
-		return e
+		return "", e
 	}
 
 	fmt.Printf("method: %s, url: %s, headers: %v, body: %s\n", f.method, f.fullURL.String(), headers, body)
 
-	switch f.method {
-	case "POST", "post":
+	switch strings.ToUpper(f.method) {
+	case http.MethodPost:
 		resp, err = httputils.HttpPost(http.DefaultClient, f.fullURL.String(), headers, body)
-	case "GET", "get":
+	case http.MethodGet:
 		resp, err = httputils.HttpGet(http.DefaultClient, f.fullURL.String(), headers)
-	case "DELETE", "delete":
-		resp, err = httputils.HttpGet(http.DefaultClient, f.fullURL.String(), headers)
+	case http.MethodDelete:
+		resp, err = httputils.HttpDelete(http.DefaultClient, f.fullURL.String(), headers)
 	default:
-		return fmt.Errorf("method %s not supported", f.method)
+		return "", fmt.Errorf("method %s not supported", f.method)
 	}
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	strResp, e := httputils.HttpRespToString(resp)
 	if e != nil {
-		return fmt.Errorf("failed to parse http response to string, reason: %s", e.Error())
-	} else {
-		fmt.Printf("response: %s", strResp)
+		return "", fmt.Errorf("failed to parse http response to string, reason: %s", e.Error())
 	}
-	return nil
+
+	if f.pathToOutput != "" {
+		if err := os.WriteFile(f.pathToOutput, []byte(strResp), 0644); err != nil {
+			return "", fmt.Errorf("error writing response to file: %s", err.Error())
+		}
+		fmt.Printf("response was written to file: %s\n", f.pathToOutput)
+
+	}
+	return strResp, nil
 }

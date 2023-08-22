@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 )
 
@@ -11,8 +12,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := Request(parser); err != nil {
+	if response, err := Request(parser); err != nil {
 		log.Fatal(err)
+	} else {
+		fmt.Printf("response: %s", response)
 	}
 
 }
