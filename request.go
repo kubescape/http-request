@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"net/http"
 	"net/url"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/armosec/utils-go/httputils"
@@ -71,6 +73,14 @@ func loadBody(f *FlagParser) ([]byte, error) {
 	return []byte{}, nil
 }
 
+func setHeaders(req *http.Request, headers map[string]string) {
+	if headers != nil && len(headers) > 0 {
+		for k, v := range headers {
+			req.Header.Set(k, v)
+		}
+	}
+}
+
 // Request run a http request
 func Request(f *FlagParser) (string, error) {
 	var resp *http.Response
@@ -87,14 +97,15 @@ func Request(f *FlagParser) (string, error) {
 
 	fmt.Printf("method: %s, url: %s, headers: %v, body: %s\n", f.method, f.fullURL.String(), headers, body)
 
-	switch strings.ToUpper(f.method) {
-	case http.MethodPost:
-		resp, err = httputils.HttpPost(http.DefaultClient, f.fullURL.String(), headers, body)
-	case http.MethodGet:
-		resp, err = httputils.HttpGet(http.DefaultClient, f.fullURL.String(), headers)
-	case http.MethodDelete:
-		resp, err = httputils.HttpDelete(http.DefaultClient, f.fullURL.String(), headers)
-	default:
+	methods := []string{http.MethodPost, http.MethodGet, http.MethodDelete}
+	if slices.Contains(methods, strings.ToUpper(f.method)) {
+		req, err := http.NewRequest(f.method, f.fullURL.String(), bytes.NewReader(body))
+		if err != nil {
+			return "", err
+		}
+		setHeaders(req, headers)
+		resp, err = http.DefaultClient.Do(req)
+	} else {
 		return "", fmt.Errorf("method %s not supported", f.method)
 	}
 
