@@ -109,7 +109,7 @@ func TestRequest(t *testing.T) {
 			flagParser.headers = "Header1:Value1;Header2:Value2"
 			if tc.outputFile != "" {
 				flagParser.pathToOutput = tc.outputFile
-				t.Cleanup(func() { os.Remove(flagParser.pathToOutput) })
+				t.Cleanup(func() { _ = os.Remove(flagParser.pathToOutput) })
 			}
 			strResp, err := Request(flagParser)
 			assert.NoErrorf(t, err, "request failed")
