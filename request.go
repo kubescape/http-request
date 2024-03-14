@@ -94,21 +94,21 @@ func Request(f *FlagParser) (string, error) {
 	if e != nil {
 		return "", e
 	}
-
-	fmt.Printf("method: %s, url: %s, headers: %v, body: %s\n", f.method, f.fullURL.String(), headers, body)
-
-	methods := []string{http.MethodPost, http.MethodGet, http.MethodDelete}
-	if slices.Contains(methods, strings.ToUpper(f.method)) {
-		req, err := http.NewRequest(f.method, f.fullURL.String(), bytes.NewReader(body))
-		if err != nil {
-			return "", err
-		}
-		setHeaders(req, headers)
-		resp, err = http.DefaultClient.Do(req)
-	} else {
-		return "", fmt.Errorf("method %s not supported", f.method)
+	method := strings.ToUpper(f.method)
+	if !slices.Contains([]string{http.MethodPost, http.MethodGet, http.MethodDelete}, method) {
+		return "", fmt.Errorf("method %s not supported", method)
 	}
 
+	fmt.Printf("method: %s, url: %s, headers: %v, body: %s\n", method, f.fullURL.String(), headers, body)
+
+	req, err := http.NewRequest(method, f.fullURL.String(), bytes.NewReader(body))
+	if err != nil {
+		return "", err
+	}
+
+	setHeaders(req, headers)
+
+	resp, err = http.DefaultClient.Do(req)
 	if err != nil {
 		return "", err
 	}

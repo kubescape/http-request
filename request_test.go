@@ -83,7 +83,7 @@ func TestRequest(t *testing.T) {
 		outputFile string
 	}{
 		"GET": {
-			method:     http.MethodGet,
+			method:     "get",
 			response:   "GET method received",
 			outputFile: "test_output.txt",
 		},
