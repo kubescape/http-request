@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/armosec/utils-go/httputils"
@@ -38,6 +39,11 @@ func (f *FlagParser) parser() {
 	flag.StringVar(&f.pathToOutput, "path-output", "", "path to output file")
 
 	flag.Parse()
+
+	// unquote headers
+	if unquote, err := strconv.Unquote(f.headers); err == nil {
+		f.headers = unquote
+	}
 }
 
 func (f *FlagParser) validate() error {
