@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"net/http"
@@ -15,11 +16,12 @@ import (
 )
 
 type FlagParser struct {
-	fullURL      url.URL
-	pathToBody   string
-	headers      string
-	method       string
-	pathToOutput string
+	fullURL       url.URL
+	pathToBody    string
+	headers       string
+	method        string
+	pathToOutput  string
+	skipSSLVerify bool
 }
 
 func NewFlagParser() *FlagParser {
@@ -37,6 +39,7 @@ func (f *FlagParser) parser() {
 	flag.StringVar(&f.pathToBody, "path-body", "", "path to body")
 	flag.StringVar(&f.headers, "headers", "", "http headers")
 	flag.StringVar(&f.pathToOutput, "path-output", "", "path to output file")
+	flag.BoolVar(&f.skipSSLVerify, "skip-ssl-verify", false, "skip SSL verification")
 
 	flag.Parse()
 
@@ -114,9 +117,22 @@ func Request(f *FlagParser) (string, error) {
 
 	setHeaders(req, headers)
 
-	resp, err = http.DefaultClient.Do(req)
-	if err != nil {
-		return "", err
+	if f.skipSSLVerify {
+		fmt.Printf("skipping SSL verification\n")
+		client := &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			},
+		}
+		resp, err = client.Do(req)
+		if err != nil {
+			return "", err
+		}
+	} else {
+		resp, err = http.DefaultClient.Do(req)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	strResp, e := httputils.HttpRespToString(resp)
