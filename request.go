@@ -147,5 +147,6 @@ func Request(f *FlagParser) (string, error) {
 		fmt.Printf("response was written to file: %s\n", f.pathToOutput)
 
 	}
+
 	return strResp, nil
 }
