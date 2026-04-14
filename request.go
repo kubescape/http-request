@@ -134,6 +134,7 @@ func Request(f *FlagParser) (string, error) {
 			return "", err
 		}
 	}
+	defer resp.Body.Close()
 
 	strResp, e := httputils.HttpRespToString(resp)
 	if e != nil {
