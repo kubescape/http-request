@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -134,7 +135,9 @@ func Request(f *FlagParser) (string, error) {
 			return "", err
 		}
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 
 	strResp, e := httputils.HttpRespToString(resp)
 	if e != nil {
