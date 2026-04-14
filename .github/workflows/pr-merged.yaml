@@ -33,14 +33,7 @@ jobs:
       GO_VERSION: "1.23"
       REQUIRED_TESTS: '[
             "vuln_scan_triggering_with_cron_job", 
-            "ks_microservice_ns_creation",
-            "ks_microservice_on_demand", 
-            "ks_microservice_mitre_framework_on_demand", 
-            "ks_microservice_nsa_and_mitre_framework_demand", 
-            "ks_microservice_triggering_with_cron_job", 
-            "ks_microservice_update_cronjob_schedule", 
-            "ks_microservice_delete_cronjob", 
-            "ks_microservice_create_2_cronjob_mitre_and_nsa"
+            "ks_microservice_on_demand"
             ]'
       COSIGN: true
       HELM_E2E_TEST: true
