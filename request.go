@@ -65,7 +65,7 @@ func loadHeaders(f *FlagParser) (map[string]string, error) {
 	if f.headers != "" {
 		splitteedHeaders := strings.Split(f.headers, ";")
 		for i := range splitteedHeaders {
-			header := strings.Split(splitteedHeaders[i], ":")
+			header := strings.SplitN(splitteedHeaders[i], ":", 2)
 			if len(header) == 2 {
 				headers[header[0]] = strings.TrimLeft(header[1], " ")
 			}

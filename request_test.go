@@ -51,6 +51,15 @@ func TestLoadHeaders(t *testing.T) {
 		assert.Equal(t, "bar", headers["Auth"])
 
 	}
+	{
+		f := FlagParser{
+			headers: "Referer:http://example.com:8080/path",
+		}
+		headers, err := loadHeaders(&f)
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(headers))
+		assert.Equal(t, "http://example.com:8080/path", headers["Referer"])
+	}
 }
 
 func setupTestServer(t *testing.T) *httptest.Server {
